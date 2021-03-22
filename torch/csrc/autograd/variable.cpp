@@ -4,6 +4,7 @@
 #include <torch/csrc/autograd/edge.h>
 #include <torch/csrc/autograd/engine.h>
 #include <torch/csrc/autograd/function.h>
+#include <torch/csrc/autograd/InferenceMode.h>
 #include <torch/csrc/autograd/functions/accumulate_grad.h>
 #include <torch/csrc/autograd/functions/tensor.h>
 #include <torch/csrc/autograd/generated/Functions.h>
@@ -510,7 +511,7 @@ void handle_view_on_rebase(DifferentiableViewMeta* diff_view_meta, bool indirect
       msg = c10::str("Output ", diff_view_meta->output_nr_, " of ", grad_fn->name(), " is a view and ",
                      modified_obj, " modified inplace.");
     } else {
-      msg = c10::str("A view was created in no_grad mode and ", modified_obj, " modified inplace with grad mode enabled.");
+      msg = c10::str("A view was created in no_grad/inference mode and ", modified_obj, " modified inplace with grad mode enabled.");
     }
 
     if (creation_meta == CreationMeta::MULTI_OUTPUT_NODE) {
@@ -518,7 +519,7 @@ void handle_view_on_rebase(DifferentiableViewMeta* diff_view_meta, bool indirect
                          " allow the output views to be modified inplace. You should replace the inplace operation by an"
                          " out-of-place one.");
     } else {
-      if (creation_meta == CreationMeta::NO_GRAD_MODE) {
+      if (creation_meta == CreationMeta::NO_GRAD_FN) {
         TORCH_INTERNAL_ASSERT(!grad_fn);
         msg = c10::str(msg, " Given that this use case is ambiguous and error-prone, it is deprecated and will be forbidden"
                        "  starting 1.6 (see https://github.com/pytorch/pytorch/pull/32839 for more details about this). You"

@@ -452,7 +452,7 @@ struct TORCH_API ViewInfo {
 /// Given that this particular code example is ambiguous and can easily be replace by
 /// either moving both inside the no_grad block or both outside, we explicitly forbid
 /// it. For now, it is deprecated by a warning. This is achieved by setting
-/// creation_meta=CreationMeta::NO_GRAD_MODE for all differentiable views created
+/// creation_meta=CreationMeta::NO_GRAD_FN for all differentiable views created
 /// in no_grad mode.
 ///
 /// See Note [View + Inplace update for base tensor]
@@ -493,7 +493,7 @@ struct TORCH_API ViewInfo {
 /// Flag that gives more information about when this view was created:
 /// - IN_CUSTOM_FUNCTION should be set when the view is created inside a custom
 ///   autograd Function is returned.
-/// - NO_GRAD_MODE should be set when a view in created when GradMode is disabled
+/// - NO_GRAD_FN should be set when a view in created in GradMode(false)/InferenceMode
 /// - MULTI_OUTPUT_NODE should be set when a Node created by codegen code returns
 ///   multiple differentiable views
 /// - MULTI_OUTPUT_SAFE should be set when a view was returned by a function
@@ -503,7 +503,7 @@ struct TORCH_API ViewInfo {
 ///   warning will be thrown.
 /// - DEFAULT is for all other cases
 enum class CreationMeta: uint8_t { DEFAULT, IN_CUSTOM_FUNCTION, MULTI_OUTPUT_NODE,
-                                   NO_GRAD_MODE, MULTI_OUTPUT_SAFE };
+                                   NO_GRAD_FN, MULTI_OUTPUT_SAFE};
 
 /// Handles correctly propagating CreationMeta when a new view is created from a previous view.
 /// In general, we don't want the new view to be _less_ restrictive than the previous view
