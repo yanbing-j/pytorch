@@ -273,7 +273,7 @@ class TestFunctionalIterDataPipe(TestCase):
 
         unpicklable_datapipes: List[Tuple[Type[IterDataPipe], IterDataPipe, Tuple, Dict[str, Any]]] = [
             (dp.iter.Map, IDP(arr), (lambda x: x, ), {}),
-            (dp.iter.Collate, IDP(arr), (lambda x: xi, ), {}),
+            (dp.iter.Collate, IDP(arr), (lambda x: x, ), {}),
             (dp.iter.Filter, IDP(arr), (lambda x: x >= 5, ), {}),
         ]
         for dpipe, input_dp, dp_args, dp_kwargs in unpicklable_datapipes:
@@ -696,6 +696,42 @@ class TestTyping(TestCase):
         dp = DP6()
         self.assertTrue(dp.type.param == int)
         self.assertNotEqual(id(DP6.type), id(dp.type))
+
+    def test_construct_time(self):
+        from torch.utils.data import construct_time_validation
+
+        class DP0(IterDataPipe[Tuple]):
+            @construct_time_validation
+            def __init__(self, dp: IterDataPipe):
+                self.dp = dp
+
+            def __iter__(self) -> Iterator[Tuple]:
+                for d in self.dp:
+                    yield d, str(d)
+
+        class DP1(IterDataPipe[int]):
+            @construct_time_validation
+            def __init__(self, dp: IterDataPipe[Tuple[int, str]]):
+                self.dp = dp
+
+            def __iter__(self) -> Iterator[int]:
+                for a, b in self.dp:
+                    yield a
+
+        # Non-DataPipe input with DataPipe hint
+        datasource = [(1, '1'), (2, '2'), (3, '3')]
+        with self.assertRaisesRegex(TypeError, r"Expected argument 'dp' as a IterDataPipe"):
+            dp = DP0(datasource)
+
+        dp = DP0(IDP(range(10)))
+        with self.assertRaisesRegex(TypeError, r"Expected type of argument 'dp' as a subtype"):
+            dp = DP1(dp)
+
+        with self.assertRaisesRegex(TypeError, r"Can not decorate"):
+            class InvalidDP1(IterDataPipe[int]):
+                @construct_time_validation
+                def __iter__(self):
+                    yield 0
 
 
 if __name__ == '__main__':
