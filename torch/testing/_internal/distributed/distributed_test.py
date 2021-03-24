@@ -5123,11 +5123,11 @@ class DistributedTest:
         @require_backend({"gloo"})
         @require_backends_available({"gloo"})
         def test_monitored_barrier_gloo(self):
-            process_group = dist.new_group(ranks=list(i for i in range(int(self.world_size))))
+            world_size = int(self.world_size)
             tensors = [torch.ones(10) * self.rank]
             # Kick off some allreduce work on all ranks
             for _ in range(10):
-                process_group.allreduce(tensors).wait()
+                dist.all_reduce(torch.cat(tensors))
             # Run monitored barrier
             timeout = timedelta(seconds=2)
             process_group.monitored_barrier(timeout)
@@ -5138,12 +5138,12 @@ class DistributedTest:
                 return
             if self.rank == 0:
                 with self.assertRaisesRegex(RuntimeError, f"Rank {failed_rank}"):
-                    process_group.monitored_barrier(timeout)
+                    dist.monitored_barrier(timeout)
             else:
                 # Other ranks will report standard gloo error, only rank 0 knows
                 # ranks that failed to respond to barrier.
                 with self.assertRaises(RuntimeError):
-                    process_group.monitored_barrier(timeout)
+                    dist.monitored_barrier(timeout)
 
         @require_backend({"gloo", "nccl"})
         @require_backends_available({"gloo", "nccl"})
@@ -5179,3 +5179,27 @@ class DistributedTest:
             monitored_barrier_timeout_seconds = timedelta(seconds=2)
             with self.assertRaisesRegex(RuntimeError, f"Rank {failed_rank}"):
                 gloo_pg.monitored_barrier(monitored_barrier_timeout_seconds)
+
+        @require_backend({"gloo"})
+        @require_backends_available({"gloo"})
+        def test_monitored_barrier_gloo_subgroup(self):
+            failed_rank = 1
+            timeout = timedelta(seconds=1)
+            subgroup = dist.new_group(ranks=[0, 1])
+            if self.rank == failed_rank:
+                return
+            if self.rank == 0:
+                with self.assertRaisesRegex(RuntimeError, f"Rank {failed_rank}"):
+                    dist.monitored_barrier(subgroup, timeout)
+            else:
+                # Other ranks call into monitored barrier, but should not erorr
+                # out since the barrier is a noop because they are not part of
+                # the subgroup
+                dist.monitored_barrier(subgroup, timeout)
+
+        @require_backend({"nccl"})
+        @require_backends_available({"nccl"})
+        def test_monitored_barrier_nccl_error(self):
+            # Test that error is raised with nccl backend
+            with self.assertRaisesRegex(RuntimeError, "only implemented for GLOO"):
+                dist.monitored_barrier()
