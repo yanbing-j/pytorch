@@ -907,7 +907,7 @@ NvrtcFunction nvrtcCompile(
   });
 
 #ifdef __HIP_PLATFORM_HCC__
-  std::vector<const char*> args = {"--std=c++14"};
+  std::vector<const char*> args = {"--std=c++17"};
 #if ROCM_VERSION >= 40200
   args.push_back("-hip-pch");
 #endif
@@ -928,7 +928,7 @@ NvrtcFunction nvrtcCompile(
       std::to_string(minor);
   // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
   std::vector<const char*> args = {
-      "--std=c++14", compute.c_str(), "-default-device"};
+      "--std=c++17", compute.c_str(), "-default-device"};
 #endif
 
   const char* disable_fma = getenv("PYTORCH_NVFUSER_DISABLE_FMA");

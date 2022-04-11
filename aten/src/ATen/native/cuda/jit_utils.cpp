@@ -1093,7 +1093,7 @@ NvrtcFunction jit_pwise_function(
       std::to_string(cuda_minor);
   // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
   std::vector<const char*> args = {
-      "--std=c++14", compute.c_str(), "-default-device"};
+      "--std=c++17", compute.c_str(), "-default-device"};
 
   #ifndef NDEBUG
     // Add line info to generated kernels

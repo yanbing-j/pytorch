@@ -132,7 +132,7 @@ minimal CMakeLists.txt file would look like:
 
     add_executable(example-app example-app.cpp)
     target_link_libraries(example-app "${TORCH_LIBRARIES}")
-    set_property(TARGET example-app PROPERTY CXX_STANDARD 14)
+    set_property(TARGET example-app PROPERTY CXX_STANDARD 17)
 
 
 The last step is configuring and building the project. Assuming that our code

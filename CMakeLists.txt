@@ -41,7 +41,7 @@ if(env_cxx_standard GREATER -1)
       WARNING "C++ standard version definition detected in environment variable."
       "PyTorch requires -std=c++14. Please remove -std=c++ settings in your environment.")
 endif()
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 if(DEFINED GLIBCXX_USE_CXX11_ABI)
@@ -327,9 +327,9 @@ cmake_dependent_option(
 cmake_dependent_option(
     USE_TENSORPIPE "Use TensorPipe. Only available if USE_DISTRIBUTED is on." ON
     "USE_DISTRIBUTED" OFF)
-option(USE_TBB "Use TBB (Deprecated)" OFF)
+option(USE_TBB "Use TBB (Deprecated)" ON)
 cmake_dependent_option(
-    USE_SYSTEM_TBB "Use system-provided Intel TBB." OFF "USE_TBB" OFF)
+    USE_SYSTEM_TBB "Use system-provided Intel TBB." ON "USE_TBB" ON)
 option(ONNX_ML "Enable traditional ONNX ML API." ON)
 option(HAVE_SOVERSION "Whether to add SOVERSION to the shared objects" OFF)
 option(BUILD_LIBTORCH_CPU_WITH_DEBUG "Enable RelWithDebInfo for libtorch_cpu target only" OFF)
@@ -845,7 +845,7 @@ if(NOT MSVC)
     string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-private-field")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-inconsistent-missing-override")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-aligned-allocation-unavailable")
-    string(APPEND CMAKE_CXX_FLAGS " -Wno-c++14-extensions")
+    string(APPEND CMAKE_CXX_FLAGS " -Wno-c++17-extensions")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-constexpr-not-const")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-missing-braces")
     string(APPEND CMAKE_CXX_FLAGS " -Qunused-arguments")

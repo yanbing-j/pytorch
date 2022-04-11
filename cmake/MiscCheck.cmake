@@ -45,7 +45,7 @@ if(NOT INTERN_BUILD_MOBILE)
   # ---[ Check if certain std functions are supported. Sometimes
   # _GLIBCXX_USE_C99 macro is not defined and some functions are missing.
   cmake_push_check_state(RESET)
-  set(CMAKE_REQUIRED_FLAGS "-std=c++14")
+  set(CMAKE_REQUIRED_FLAGS "-std=c++17")
   CHECK_CXX_SOURCE_COMPILES("
   #include <cmath>
   #include <string>
@@ -72,7 +72,7 @@ endif()
 
 # ---[ Check if std::exception_ptr is supported.
 cmake_push_check_state(RESET)
-set(CMAKE_REQUIRED_FLAGS "-std=c++14")
+set(CMAKE_REQUIRED_FLAGS "-std=c++17")
 CHECK_CXX_SOURCE_COMPILES(
     "#include <string>
     #include <exception>
@@ -99,7 +99,7 @@ cmake_pop_check_state()
 # are building under. If yes, we will turn off deprecation warning for a
 # cleaner build output.
 cmake_push_check_state(RESET)
-set(CMAKE_REQUIRED_FLAGS "-std=c++14")
+set(CMAKE_REQUIRED_FLAGS "-std=c++17")
 CHECK_CXX_SOURCE_COMPILES(
     "#include <glog/stl_logging.h>
     int main(int argc, char** argv) {

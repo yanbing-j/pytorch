@@ -1585,8 +1585,8 @@ def _prepare_ldflags(extra_ldflags, with_cuda, verbose, is_standalone):
         if not is_standalone:
             extra_ldflags.append('-ltorch_python')
 
-        if is_standalone and "TBB" in torch.__config__.parallel_info():
-            extra_ldflags.append('-ltbb')
+        # if is_standalone and "TBB" in torch.__config__.parallel_info():
+        extra_ldflags.append('-ltbb')
 
         if is_standalone:
             extra_ldflags.append(f"-Wl,-rpath,{TORCH_LIB_PATH}")
@@ -1892,7 +1892,7 @@ def _write_ninja_file_to_build_library(path,
         cflags = common_cflags + COMMON_MSVC_FLAGS + extra_cflags
         cflags = _nt_quote_args(cflags)
     else:
-        cflags = common_cflags + ['-fPIC', '-std=c++14'] + extra_cflags
+        cflags = common_cflags + ['-fPIC', '-std=c++17'] + extra_cflags
 
     if with_cuda and IS_HIP_EXTENSION:
         cuda_flags = ['-DWITH_HIP'] + cflags + COMMON_HIP_FLAGS + COMMON_HIPCC_FLAGS
@@ -1915,7 +1915,7 @@ def _write_ninja_file_to_build_library(path,
             cuda_flags += ['--compiler-options', "'-fPIC'"]
             cuda_flags += extra_cuda_cflags
             if not any(flag.startswith('-std=') for flag in cuda_flags):
-                cuda_flags.append('-std=c++14')
+                cuda_flags.append('-std=c++17')
             if os.getenv("CC") is not None:
                 cuda_flags = ['-ccbin', os.getenv("CC")] + cuda_flags
     else:

@@ -11,6 +11,7 @@
 #include <c10/util/irange.h>
 
 #include <utility>
+#include <iostream>
 
 namespace at {
 namespace meta {
@@ -873,7 +874,7 @@ std::tuple<Tensor&, Tensor&> sort_out_cpu_stable(const Tensor& self,
     Tensor& indices) {
   values.resize_(self.sizes()).copy_(self);
   indices.resize_(self.sizes());
-
+// printf("sort_out_cpu_stable\n");
   // check if self is scalar
   if (self.dim() == 0 && self.numel() == 1) {
     indices.zero_();
@@ -891,6 +892,7 @@ std::tuple<Tensor&, Tensor&> sort_out_cpu(const Tensor& self,
     bool descending,
     Tensor& values,
     Tensor& indices) {
+      // printf("sort_out_cpu\n");
   return at::native::sort_out_cpu_stable(
       self, /*stable=*/false, dim, descending, values, indices);
 }
@@ -900,6 +902,7 @@ std::tuple<Tensor, Tensor> sort_cpu_stable(
     c10::optional<bool> stable,
     int64_t dim,
     bool descending) {
+      // printf("sort_cpu_stable\n");
   TORCH_CHECK(!self.is_complex(), "sort(): input tensor must be of non-complex type");
   Tensor values = at::empty({0}, self.options());
   Tensor indices = at::empty({0}, self.options().dtype(kLong));
@@ -910,6 +913,7 @@ std::tuple<Tensor, Tensor> sort_cpu(
     const Tensor& self,
     int64_t dim,
     bool descending) {
+  // std::cout<<"sort_cpu\n";
   return sort_cpu_stable(self, /*stable=*/false, dim, descending);
 }
 

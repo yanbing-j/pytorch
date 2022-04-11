@@ -10,6 +10,7 @@
 #include <ATen/native/TopKImpl.h>
 #include <c10/core/WrapDimMinimal.h>
 #include <c10/util/irange.h>
+#include <execution>
 
 namespace at { namespace native {
 
@@ -115,21 +116,25 @@ static void sort_kernel(
 
       if (descending) {
         if (stable) {
-          std::stable_sort(composite_accessor, composite_accessor + dim_size,
+          // printf("des stable %ld", __cplusplus);
+          std::stable_sort(std::execution::par, composite_accessor, composite_accessor + dim_size,
             KeyValueCompDesc<scalar_t>());
         }
         else {
-          std::sort(composite_accessor, composite_accessor + dim_size,
+          // printf("des %ld", __cplusplus);
+          std::sort(std::execution::par, composite_accessor, composite_accessor + dim_size,
             KeyValueCompDesc<scalar_t>());
         }
       }
       else {
         if (stable) {
-          std::stable_sort(composite_accessor, composite_accessor + dim_size,
+          // printf("asc stable %ld", __cplusplus);
+          std::stable_sort(std::execution::par, composite_accessor, composite_accessor + dim_size,
             KeyValueCompAsc<scalar_t>());
         }
         else {
-          std::sort(composite_accessor, composite_accessor + dim_size,
+          // printf("asc %ld", __cplusplus);
+          std::sort(std::execution::par, composite_accessor, composite_accessor + dim_size,
             KeyValueCompAsc<scalar_t>());
         }
       }
