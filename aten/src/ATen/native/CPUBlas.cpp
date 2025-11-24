@@ -3,6 +3,7 @@
 #include <ATen/native/mkl/LinearAlgebra.h>
 #include <ATen/native/mkldnn/Matmul.h>
 #include <ATen/Config.h>
+#include <ATen/Parallel.h>
 
 #include <c10/util/SmallBuffer.h>
 #include <c10/util/irange.h>
@@ -1004,8 +1005,9 @@ struct KernelCache  {
   }
 
   static kstore_t& get_store() {
-    static thread_local kstore_t cache_kernels;
-    return cache_kernels;
+    static kstore_t cache_kernels[100];
+    int ompIdx = at::get_thread_num();
+    return cache_kernels[ompIdx];
   }
 };
 
